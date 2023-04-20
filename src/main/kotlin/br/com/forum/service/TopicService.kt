@@ -1,5 +1,6 @@
 package br.com.forum.service
 
+import br.com.forum.dto.NewTopicDTO
 import br.com.forum.model.Course
 import br.com.forum.model.Topic
 import br.com.forum.model.User
@@ -7,7 +8,9 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class TopicService(private var topics: List<Topic>) {
+class TopicService(private var topics: List<Topic>,
+                   private val courseService: CourseService,
+                   private val userService: UserService) {
 
     init {
         val user = User(id = 1, name = "Carlos", email = "carlos@email.com")
@@ -25,5 +28,18 @@ class TopicService(private var topics: List<Topic>) {
 
     fun getById(id: Long): Topic {
         return topics.stream().filter { t -> t.id == id }.findFirst().get()
+    }
+
+    fun register(newTopicDTO: NewTopicDTO) {
+        val course = courseService.getById(newTopicDTO.courseId)
+        val author = userService.getById(newTopicDTO.authorId)
+
+        topics = topics.plus(Topic(
+                id = topics.size.toLong() + 1,
+                title = newTopicDTO.title,
+                message = newTopicDTO.message,
+                course = course,
+                author = author
+        ))
     }
 }
