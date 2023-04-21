@@ -3,6 +3,7 @@ package br.com.forum.controller
 import br.com.forum.dto.NewTopicDTO
 import br.com.forum.dto.ViewTopicDTO
 import br.com.forum.service.TopicService
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -26,7 +27,7 @@ class TopicController (private val topicService: TopicService) {
     }
 
     @PostMapping
-    fun register(@RequestBody newTopicDTO: NewTopicDTO) {
+    fun register(@RequestBody @Valid newTopicDTO: NewTopicDTO) {
         topicService.register(newTopicDTO)
     }
 }
