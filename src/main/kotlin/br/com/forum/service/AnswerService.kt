@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service
 class AnswerService( private val topicService: TopicService) {
 
     fun listAnswersByTopic(id: Long): List<Answer> {
-        val topic: Topic = topicService.getById(id)
-        return topic.answers
+        return topicService.getAnswersByTopicId(id)
     }
 }

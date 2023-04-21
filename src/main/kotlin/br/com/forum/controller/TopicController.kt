@@ -1,7 +1,7 @@
 package br.com.forum.controller
 
 import br.com.forum.dto.NewTopicDTO
-import br.com.forum.model.Topic
+import br.com.forum.dto.ViewTopicDTO
 import br.com.forum.service.TopicService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,12 +16,12 @@ import java.util.*
 class TopicController (private val topicService: TopicService) {
 
     @GetMapping
-    fun list(): List<Topic> {
+    fun list(): List<ViewTopicDTO> {
         return topicService.list()
     }
 
     @GetMapping("/{id}")
-    fun findById(@PathVariable(name = "id") id: Long): Topic {
+    fun findById(@PathVariable(name = "id") id: Long): ViewTopicDTO {
         return topicService.getById(id)
     }
 
