@@ -69,4 +69,9 @@ class TopicService(private var topics: List<Topic>,
                 creationDate = topic.creationDate
         ))
     }
+
+    fun remove(id: Long) {
+        val topic = topics.stream().filter { t -> t.id == id }.findFirst().get()
+        topics = topics.minus(topic)
+    }
 }
