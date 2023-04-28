@@ -1,5 +1,6 @@
 package br.com.forum.service
 
+import br.com.forum.dto.EditTopicDTO
 import br.com.forum.dto.NewTopicDTO
 import br.com.forum.dto.ViewTopicDTO
 import br.com.forum.mappers.ViewTopicDTOMapper
@@ -52,6 +53,20 @@ class TopicService(private var topics: List<Topic>,
                 message = newTopicDTO.message,
                 course = course,
                 author = author
+        ))
+    }
+
+    fun edit(editTopicDTO: EditTopicDTO) {
+        val topic = topics.stream().filter { t -> t.id == editTopicDTO.id }.findFirst().get()
+        topics = topics.minus(topic).plus(Topic(
+                id = editTopicDTO.id,
+                title = editTopicDTO.title,
+                message = editTopicDTO.message,
+                author = topic.author,
+                course = topic.course,
+                answers = topic.answers,
+                status = topic.status,
+                creationDate = topic.creationDate
         ))
     }
 }
