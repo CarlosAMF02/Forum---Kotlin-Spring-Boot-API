@@ -3,6 +3,7 @@ package br.com.forum.service
 import br.com.forum.dto.EditTopicDTO
 import br.com.forum.dto.NewTopicDTO
 import br.com.forum.dto.ViewTopicDTO
+import br.com.forum.mappers.NewTopicDTOMapper
 import br.com.forum.mappers.ViewTopicDTOMapper
 import br.com.forum.model.Answer
 import br.com.forum.model.Course
@@ -14,9 +15,9 @@ import java.util.stream.Collectors
 
 @Service
 class TopicService(private var topics: List<Topic>,
-                   private val courseService: CourseService,
-                   private val userService: UserService,
-                   private val viewTopicDTOMapper: ViewTopicDTOMapper ) {
+                   private val viewTopicDTOMapper: ViewTopicDTOMapper,
+                   private val newTopicDTOMapper: NewTopicDTOMapper
+) {
 
     init {
         val user = User(id = 1, name = "Carlos", email = "carlos@email.com")
@@ -43,22 +44,17 @@ class TopicService(private var topics: List<Topic>,
         return topics.stream().filter { t -> t.id == id }.findFirst().get().answers
     }
 
-    fun register(newTopicDTO: NewTopicDTO) {
-        val course = courseService.getById(newTopicDTO.courseId)
-        val author = userService.getById(newTopicDTO.authorId)
+    fun register(newTopicDTO: NewTopicDTO) : ViewTopicDTO {
+        val topic: Topic = newTopicDTOMapper.map(newTopicDTO)
+        topic.id = topics.size.toLong() + 1
+        topics = topics.plus(topic)
 
-        topics = topics.plus(Topic(
-                id = topics.size.toLong() + 1,
-                title = newTopicDTO.title,
-                message = newTopicDTO.message,
-                course = course,
-                author = author
-        ))
+        return viewTopicDTOMapper.map(topic)
     }
 
-    fun edit(editTopicDTO: EditTopicDTO) {
+    fun edit(editTopicDTO: EditTopicDTO): ViewTopicDTO {
         val topic = topics.stream().filter { t -> t.id == editTopicDTO.id }.findFirst().get()
-        topics = topics.minus(topic).plus(Topic(
+        val updatedTopic = Topic(
                 id = editTopicDTO.id,
                 title = editTopicDTO.title,
                 message = editTopicDTO.message,
@@ -67,7 +63,11 @@ class TopicService(private var topics: List<Topic>,
                 answers = topic.answers,
                 status = topic.status,
                 creationDate = topic.creationDate
-        ))
+        )
+
+        topics = topics.minus(topic).plus(updatedTopic)
+
+        return viewTopicDTOMapper.map(updatedTopic)
     }
 
     fun remove(id: Long) {
