@@ -3,6 +3,7 @@ package br.com.forum.service
 import br.com.forum.dto.EditTopicDTO
 import br.com.forum.dto.NewTopicDTO
 import br.com.forum.dto.ViewTopicDTO
+import br.com.forum.exception.NotFoundException
 import br.com.forum.mappers.NewTopicDTOMapper
 import br.com.forum.mappers.ViewTopicDTOMapper
 import br.com.forum.model.Answer
@@ -16,8 +17,10 @@ import java.util.stream.Collectors
 @Service
 class TopicService(private var topics: List<Topic>,
                    private val viewTopicDTOMapper: ViewTopicDTOMapper,
-                   private val newTopicDTOMapper: NewTopicDTOMapper
+                   private val newTopicDTOMapper: NewTopicDTOMapper,
 ) {
+
+    private val notFoundMessage: String = "Tópico não encontrado"
 
     init {
         val user = User(id = 1, name = "Carlos", email = "carlos@email.com")
@@ -36,7 +39,7 @@ class TopicService(private var topics: List<Topic>,
     }
 
     fun getById(id: Long): ViewTopicDTO {
-        val topic = topics.stream().filter { t -> t.id == id }.findFirst().get()
+        val topic = topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow{NotFoundException(notFoundMessage)}
         return viewTopicDTOMapper.map(topic)
     }
 
@@ -53,7 +56,7 @@ class TopicService(private var topics: List<Topic>,
     }
 
     fun edit(editTopicDTO: EditTopicDTO): ViewTopicDTO {
-        val topic = topics.stream().filter { t -> t.id == editTopicDTO.id }.findFirst().get()
+        val topic = topics.stream().filter { t -> t.id == editTopicDTO.id }.findFirst().orElseThrow{NotFoundException(notFoundMessage)}
         val updatedTopic = Topic(
                 id = editTopicDTO.id,
                 title = editTopicDTO.title,
@@ -71,7 +74,7 @@ class TopicService(private var topics: List<Topic>,
     }
 
     fun remove(id: Long) {
-        val topic = topics.stream().filter { t -> t.id == id }.findFirst().get()
+        val topic = topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow{NotFoundException(notFoundMessage)}
         topics = topics.minus(topic)
     }
 }
